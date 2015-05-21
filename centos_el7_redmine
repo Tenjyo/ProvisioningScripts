@@ -1,0 +1,6 @@
+useradd testuser4
+echo "testuser4:passwd3" | chpasswd
+usermod -G wheel testuser4
+
+
+

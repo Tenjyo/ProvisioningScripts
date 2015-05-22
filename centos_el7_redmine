@@ -1,11 +1,13 @@
-
-
 #!/bin/bash
+
+echo "Provisoing Script Start!!" >> /tmp/provisioning.txt
 
 #user
 useradd hayakawa
 echo "hayakawa:1qaz2wsx" | chpasswd
 usermod -G wheel hayakawa
+
+
 
 
 # FireWall

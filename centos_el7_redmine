@@ -105,9 +105,9 @@ EOF
 cp /var/lib/redmine/config/configuration.yml.example /var/lib/redmine/config/configuration.yml
 sed -i -e 's/  rmagick_font_path:/  rmagick_font_path: \/usr\/share\/fonts\/ipa-pgothic\/ipagp.ttf/' /var/lib/redmine/config/configuration.yml
 
-curl -OL https://raw.githubusercontent.com/kazuhisya/SL-Redmine/master/conf/redmine-config.ru
+curl -OL https://raw.githubusercontent.com/Tenjyo/ProvisioningScripts/master/redmine-config.ru.txt
 mv /var/lib/redmine/config.ru /tmp/config.ru
-mv redmine-config.ru /var/lib/redmine/config.ru
+mv redmine-config.ru.txt /var/lib/redmine/config.ru
 
 # Redmine Install
 cd /var/lib/redmine

@@ -7,7 +7,8 @@ useradd hayakawa
 echo "hayakawa:1qaz2wsx" | chpasswd
 usermod -G wheel hayakawa
 
-
+cp -r /root/.ssh /home/hayakawa
+chown -R hayakawa /home/hayakawa/.ssh
 
 
 # FireWall

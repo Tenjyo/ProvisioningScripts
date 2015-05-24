@@ -2,14 +2,38 @@
 
 echo "Provisoing Script Start!!" >> /tmp/provisioning.txt
 
-#user
-useradd hayakawa
-echo "hayakawa:1qaz2wsx" | chpasswd
-usermod -G wheel hayakawa
+# Change to Japanese locale
+yum -y groupinstall "Japanese Support"
+sed -i.org -e "s/en_US.UTF-8/ja_JP.UTF-8/g" /etc/sysconfig/i18n
 
-cp -r /root/.ssh /home/hayakawa
-chown -R hayakawa /home/hayakawa/.ssh
+# Time zone
+/bin/cp -p /usr/share/zoneinfo/Japan /etc/localtime
+echo 'ZONE="Asia/Tokyo"' > /etc/sysconfig/clock
+echo 'UTC=false' >> /etc/sysconfig/clock
 
+#add user
+USER=hayakawa
+UPASS=1qaz2wsx
+useradd $USER
+echo "$USER:$UPASS" | chpasswd
+usermod -G wheel $USER
+cp -r /root/.ssh /home/$USER
+chown -R hayakawa /home/$USER/.ssh
+echo "$USER add!" >> /tmp/provisioning.txt
+
+USER=redmine
+useradd $USER
+UPASS=1qaz2wsx
+echo "$USER:$UPASS" | chpasswd
+usermod -G wheel $USER
+cp -r /root/.ssh /home/$USER
+chown -R hayakawa /home/$USER/.ssh
+echo "$USER add!" >> /tmp/provisioning.txt
+
+
+# ssh disable password authentication
+sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+systemctl restart sshd.service
 
 # FireWall
 systemctl enable firewalld.service
@@ -17,15 +41,6 @@ systemctl start firewalld.service
 firewall-cmd --add-service=http --zone=public --permanent
 firewall-cmd --add-service=https --zone=public --permanent
 firewall-cmd --reload
-
-# ssh disable password authentication
-sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-systemctl restart sshd.service
-
-# Time zone
-/bin/cp -p /usr/share/zoneinfo/Japan /etc/localtime
-echo 'ZONE="Asia/Tokyo"' > /etc/sysconfig/clock
-echo 'UTC=false' >> /etc/sysconfig/clock
 
 # Yum
 ## Utility
@@ -52,7 +67,6 @@ yum -y groupinstall "Development Tools"
 yum -y install openssl-devel readline-devel zlib-devel curl-devel libyaml-devel libffi-devel
 yum -y install ImageMagick ImageMagick-devel ipa-pgothic-fonts
 yum -y install ruby ruby-devel rubygems
-
 
 # MariaDB Settings
 mv /etc/my.cnf /etc/my.cnf.org
@@ -208,5 +222,28 @@ openssl x509 -in /etc/nginx/conf.d/ssl/server.crt -inform PEM -out /etc/nginx/co
 # Nginx Start
 systemctl enable nginx.service
 systemctl start nginx.service
+
+
+#http (For Subversion)　ポートは8080に設定
+yum -y install httpd
+
+udo sed -i 's/Listen 80/Listen 8080/' /etc/httpd/conf/httpd.conf
+
+# Subversion
+yum -y install subversion
+
+mkdir /var/repo
+svnadmin create /var/repo/redmine_repo
+
+
+# ---------------------------------------------------
+# Subversion http 連携認証（途中）
+# yum install mod_perl
+
+yum install perl-LDAP perl-Params-Validate perl-Module-Runtime perl-Module-Implementation perl-Class-Accessor perl-Class-Data-Inheritable perl-Crypt-PasswordMD5 perl-Test-Simple
+
+yum install perl-DBD-MySQL
+
+ln -s /var/lib/redmine/extra/svn/Redmine.pm /usr/lib64/perl5/vendor_perl/Apache2/Redmine.pm
 
 

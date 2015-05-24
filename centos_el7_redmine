@@ -18,16 +18,16 @@ useradd $USER
 echo "$USER:$UPASS" | chpasswd
 usermod -G wheel $USER
 cp -r /root/.ssh /home/$USER
-chown -R hayakawa /home/$USER/.ssh
+chown -R $USER /home/$USER/.ssh
 echo "$USER add!" >> /tmp/provisioning.txt
 
 USER=redmine
-useradd $USER
 UPASS=1qaz2wsx
+useradd $USER
 echo "$USER:$UPASS" | chpasswd
 usermod -G wheel $USER
 cp -r /root/.ssh /home/$USER
-chown -R hayakawa /home/$USER/.ssh
+chown -R $USER /home/$USER/.ssh
 echo "$USER add!" >> /tmp/provisioning.txt
 
 
